@@ -200,7 +200,7 @@ function card(b, i) {
 function render() {
   const list = view === 'saved' ? Object.values(favs) : items;
   $('viewtitle').textContent = view === 'saved' ? 'Tus favoritas' : 'Motos';
-  $('resultcount').textContent = view === 'saved' ? `${num(list.length)} guardadas en este navegador` : `${num(total)} anuncios${total > items.length ? ` · mostrando ${num(items.length)}` : ''}`;
+  $('resultcount').textContent = view === 'saved' ? `${num(list.length)} guardadas en este navegador` : `${total > 2000 ? 'Más de 2.000' : num(total)} anuncios${total > items.length ? ` · mostrando ${num(items.length)}` : ''}`;
   $('grid').innerHTML = list.length ? list.map(card).join('') : `<div class="empty"><h3>${view === 'saved' ? 'Aún no tienes favoritas' : 'Ninguna moto con estos filtros'}</h3><p>${view === 'saved' ? 'Pulsa el corazón de una moto para guardarla aquí.' : 'Prueba a quitar algún filtro.'}</p></div>`;
   $('more').hidden = view === 'saved' || items.length >= total;
   const n = Object.keys(diff()).filter(k => !['q', 'orden', 'lat', 'lon'].includes(k)).length;

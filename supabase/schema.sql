@@ -195,7 +195,7 @@ begin
     with pagina as (
       select a.*, %1$s as dist, row_number() over (order by %3$s) rn from public.anuncios a where %2$s order by %3$s limit %4$s offset %5$s)
     select jsonb_build_object(
-      'total', (select count(*) from public.anuncios a where %2$s),
+      'total', (select count(*) from (select 1 from public.anuncios a where %2$s limit 2001) c),
       'pag', %6$s, 'por', %4$s,
       'items', coalesce((select jsonb_agg(jsonb_build_object(
           'id', p.id, 'fuente', p.fuente, 'url', p.url, 'titulo', p.titulo, 'descripcion', left(p.descripcion, 300),
