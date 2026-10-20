@@ -1,0 +1,38 @@
+name: Actualizar anuncios
+
+on:
+  schedule:
+    - cron: '30 4 * * *'   # 04:30 UTC = 06:30 en Madrid (verano), 05:30 (invierno)
+  workflow_dispatch:
+    inputs:
+      solo:
+        description: 'Fuentes (separadas por comas)'
+        default: 'motosnet,wallapop,milanuncios'
+      max_fichas:
+        description: 'Límite de fichas nuevas de Wallapop (vacío = sin límite)'
+        default: ''
+
+concurrency:
+  group: actualizar
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pasada diaria
+        working-directory: scraper
+        env:
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          INGEST_KEY: ${{ secrets.INGEST_KEY }}
+          SOLO: ${{ github.event.inputs.solo || 'motosnet,wallapop,milanuncios' }}
+          MAX_FICHAS: ${{ github.event.inputs.max_fichas }}
+        run: |
+          args="--solo $SOLO"
+          if [ -n "$MAX_FICHAS" ]; then args="$args --max-fichas $MAX_FICHAS"; fi
+          python3 -u main.py $args

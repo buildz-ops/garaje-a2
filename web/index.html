@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#f2f2f2" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#1f1f1f" media="(prefers-color-scheme: dark)">
+<title>Garage · buscador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<script>try{const t=localStorage.getItem('garage-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="garage.css">
+</head>
+<body>
+<header class="topbar" id="topbar"><div class="topinner">
+ <a class="brand" href="#"><span class="brand-mark">G</span>Garage<small>buscador</small></a>
+ <nav class="topnav" id="topnav" hidden><span class="nav-pill" id="navpill"></span>
+  <button data-view="all" aria-current="page"><span data-icon="search"></span><span class="lbl">Buscar</span></button>
+  <button data-view="saved"><span data-icon="heart"></span><span class="lbl">Favoritas</span><span class="count" id="savecount">0</span></button>
+ </nav>
+ <div class="topend"><span class="who hide-m" id="who"></span><button class="iconbtn" id="theme" aria-label="Cambiar tema"><span data-icon="moon"></span></button></div>
+</div></header>
+
+<section class="gate" id="gate" hidden>
+ <span class="eyebrow"><span class="dot"></span>Acceso privado</span>
+ <h1>Garage, buscador de motos</h1>
+ <p>Este buscador es solo por invitación. Pega el código de acceso que te han pasado o abre directamente el enlace que recibiste.</p>
+ <form id="gateform"><input class="input" id="gatetoken" autocomplete="off" spellcheck="false" placeholder="Código de acceso" aria-label="Código de acceso"><button class="btn primary" type="submit">Entrar</button></form>
+ <div class="err" id="gateerr" role="alert"></div>
+</section>
+
+<div class="page" id="app" hidden>
+<section class="hero compact">
+ <span class="eyebrow"><span class="dot"></span><span id="eyebrow">Cargando…</span></span>
+ <h1>Todas las motos de segunda mano, <em>en un sitio.</em></h1>
+ <p class="lead">Wallapop, Milanuncios y motos.net de toda España, actualizados cada día. Filtra por precio, forma de pago, marca, modelo, tipo, A2 o distancia y abre el anuncio original para contactar.</p>
+ <div class="stats" id="stats"></div>
+</section>
+
+<div class="toolbar" id="toolbar">
+ <button class="btn filterbtn" id="togglefilters" aria-expanded="true" aria-controls="filters"><span data-icon="filter"></span>Filtros<span class="count" id="filtercount" hidden>0</span></button>
+ <label class="searchwrap"><span data-icon="search"></span><input id="q" type="search" placeholder="Modelo, palabra clave… (ej. «mt 07 akrapovic»)" aria-label="Buscar"></label>
+ <select id="orden" class="select" aria-label="Ordenar">
+  <option value="">Más nuevas</option><option value="precio">Precio ↑</option><option value="-precio">Precio ↓</option>
+  <option value="km">Menos km</option><option value="-anio">Más recientes (año)</option><option value="dist">Más cerca</option>
+ </select>
+</div>
+
+<div class="layout" id="layout">
+ <aside class="filters" id="filters" aria-label="Filtros">
+  <div class="fhead"><h2>Filtros</h2><div><button class="linkbtn" id="reset">Restablecer</button><button class="iconbtn only-m" id="closefilters" aria-label="Cerrar filtros" style="display:inline-grid;margin-left:6px;width:34px;height:34px"><span data-icon="close"></span></button></div></div>
+  <div class="fgroup"><span class="flabel">Forma de pago</span><div class="seg" id="f-fin" data-single></div></div>
+  <div class="fgroup"><span class="flabel">Vendedor</span><div class="seg" id="f-vendedor" data-single></div></div>
+  <div class="fgroup"><span class="flabel">Precio (€)</span><div class="pair"><input class="input num" id="f-pmin" type="number" min="0" step="100" placeholder="Desde"><input class="input num" id="f-pmax" type="number" min="0" step="100" placeholder="Hasta"></div></div>
+  <div class="fgroup"><span class="flabel">Marca</span><div class="seg" id="f-marca"></div><select class="select" id="f-marca-otra" style="margin-top:8px"><option value="">Otra marca…</option></select></div>
+  <div class="fgroup"><label for="f-modelo">Modelo</label><input class="input" id="f-modelo" placeholder="Ej. MT-07, Z900, Tenere" list="modelos"></div>
+  <div class="fgroup"><span class="flabel">Tipo</span><div class="seg" id="f-tipo"></div></div>
+  <div class="fgroup"><span class="flabel">Carnet A2</span><div class="seg" id="f-a2"></div></div>
+  <div class="fgroup"><span class="flabel">Kilómetros máximos</span><input class="input num" id="f-kmmax" type="number" min="0" step="1000" placeholder="Sin límite"></div>
+  <div class="fgroup"><span class="flabel">Año</span><div class="pair"><input class="input num" id="f-amin" type="number" min="1950" max="2030" placeholder="Desde"><input class="input num" id="f-amax" type="number" min="1950" max="2030" placeholder="Hasta"></div></div>
+  <div class="fgroup"><span class="flabel">Cilindrada (cc)</span><div class="pair"><input class="input num" id="f-ccmin" type="number" min="0" step="50" placeholder="Desde"><input class="input num" id="f-ccmax" type="number" min="0" step="50" placeholder="Hasta"></div></div>
+  <div class="fgroup"><label for="f-provincia">Provincia</label><select class="select" id="f-provincia"><option value="">Toda España</option></select></div>
+  <div class="fgroup"><span class="flabel">Cerca de mí</span><div class="pair"><button class="btn" id="geo" type="button"><span data-icon="pin"></span>Ubicarme</button><input class="input num" id="f-radio" type="number" min="5" step="5" placeholder="Radio km" disabled></div><p class="fnote" id="geonote" style="margin:8px 0 0"></p></div>
+  <div class="fgroup"><span class="flabel">Web</span><div class="seg" id="f-fuente" data-single></div></div>
+  <div class="fgroup"><label class="toggle">Solo con envío<input type="checkbox" id="f-envio"></label></div>
+  <p class="fnote">Los datos salen de los anuncios. Marca, modelo, CV y tipo se completan a veces con otros anuncios del mismo modelo: compruébalos en el anuncio.</p>
+  <div class="only-m" style="margin-top:16px"><button class="btn accent" id="applyfilters" style="width:100%">Ver resultados</button></div>
+ </aside>
+ <main id="main">
+  <div class="reshead"><div><h2 id="viewtitle">Motos</h2><p id="resultcount" aria-live="polite"></p></div></div>
+  <div class="activechips" id="activechips"></div>
+  <div class="grid" id="grid"></div>
+  <div class="more"><button class="btn" id="more" hidden>Cargar más</button></div>
+ </main>
+</div>
+<footer class="foot"><span id="foot">Garage · uso privado. Un anuncio visible no garantiza que siga a la venta.</span><a href="#" id="logout">Salir</a></footer>
+</div>
+<datalist id="modelos"></datalist>
+<div class="sheetmask" id="sheetmask" hidden></div>
+<div id="toast" class="toast hidden" role="status"></div>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
