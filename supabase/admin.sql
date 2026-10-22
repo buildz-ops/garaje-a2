@@ -83,4 +83,5 @@ grant execute on function public.admin_tokens(text), public.admin_crear(text, te
   public.admin_revocar(text, bigint, boolean), public.admin_editar(text, bigint, int, int, text) to anon, authenticated;
 grant execute on function public.validar(text) to anon, authenticated;
 
-update public.tokens set admin = true where id = 1;  -- Ayoub
+-- El admin es un token aparte (no el de búsqueda). Crearlo una vez desde el SQL Editor:
+--   insert into tokens (hash, nombre, max_hora, admin) values (_sha(<código>), 'Nombre · admin', 1000, true);

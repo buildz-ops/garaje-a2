@@ -9,8 +9,8 @@ document.querySelectorAll('[data-icon]').forEach(e => e.innerHTML = icon(e.datas
 const store = {get: k => {try {return localStorage.getItem(k)} catch (e) {return null}}, set: (k, v) => {try {v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v)} catch (e) {}}};
 const BASE = location.origin + location.pathname.replace(/admin(\.html)?$/, '');
 
-/* El token de admin es el mismo que el del buscador: llega por ?t= o ya está guardado en este navegador */
-let TOKEN = new URLSearchParams(location.search).get('t') || store.get('garage-token');
+/* El código de admin es distinto del de búsqueda y se guarda aparte: el enlace del buscador nunca abre el panel */
+let TOKEN = new URLSearchParams(location.search).get('t') || store.get('garage-admin');
 if (new URLSearchParams(location.search).has('t')) history.replaceState(null, '', location.pathname);
 
 const ERR = {token_invalido: 'token', limite_superado: 'limite', no_admin: 'admin', no_puedes_revocarte: 'yo', nombre_vacio: 'nombre'};
@@ -32,7 +32,7 @@ $('gateform').addEventListener('submit', e => {
   let v = $('gatetoken').value.trim(); const m = v.match(/[?&]t=([0-9a-f]+)/i); if (m) v = m[1];
   TOKEN = v; start();
 });
-$('logout').addEventListener('click', e => {e.preventDefault(); store.set('garage-token', null); TOKEN = null; showGate()});
+$('logout').addEventListener('click', e => {e.preventDefault(); store.set('garage-admin', null); TOKEN = null; showGate()});
 
 const themeBtn = $('theme');
 const curTheme = () => document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -171,14 +171,15 @@ async function start() {
   try {
     const v = await rpc('validar', {});
     if (!v || !v.admin) {
+      store.set('garage-admin', null);
       return showGate('Este código sirve para el buscador, pero no es de administrador.');
     }
-    store.set('garage-token', TOKEN);
+    store.set('garage-admin', TOKEN);
     $('who').textContent = 'Hola, ' + v.nombre;
     $('gate').hidden = true; $('app').hidden = false;
     await cargar();
   } catch (e) {
-    if (e.message === 'token') {store.set('garage-token', null); return showGate(TOKEN ? 'Ese código no es válido o ha caducado.' : '')}
+    if (e.message === 'token') {store.set('garage-admin', null); return showGate(TOKEN ? 'Ese código no es válido o ha caducado.' : '')}
     showGate(MSG[e.message] || MSG.red);
   }
 }
