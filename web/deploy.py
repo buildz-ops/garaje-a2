@@ -6,7 +6,7 @@ import os, sys, time, json, hashlib, urllib.request, urllib.error, urllib.parse
 HERE = os.path.dirname(os.path.abspath(__file__))
 TEAM = os.environ.get('VERCEL_TEAM', 'ayoubs-projects-2ddf4279')
 PROJECT = os.environ.get('VERCEL_PROJECT', 'garage-buscador')
-FILES = ['index.html', 'app.js', 'config.js', 'garage.css', 'vercel.json', 'robots.txt']
+FILES = ['index.html', 'app.js', 'admin.html', 'admin.js', 'config.js', 'garage.css', 'vercel.json', 'robots.txt']
 tok = os.environ.get('VERCEL_TOKEN')
 if not tok:
     sys.exit('NO_TOKEN')

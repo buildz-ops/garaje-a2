@@ -348,3 +348,39 @@ textarea.input{height:96px;padding:10px 12px;resize:vertical}
 .hero.compact h1{font-size:clamp(30px,4.6vw,52px)}
 .who{font-size:12.5px;color:var(--text-3)}
 @media (max-width:640px){.gate{margin:6vh 16px 0;padding:26px 20px}.gate form{flex-direction:column}.hero.compact{padding:24px 20px 20px}}
+
+/* ── Panel de administración (admin.html) ── */
+.btn.sm{padding:7px 13px;font-size:13px}
+.btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 35%,var(--line))}
+.btn.danger:hover{background:var(--bad-soft)}
+.btn:disabled{opacity:.55;pointer-events:none}
+.select.sm{height:34px;font-size:13px;padding:0 30px 0 12px;background-position:right 11px center}
+.adm{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}
+.adm #nuevo{position:sticky;top:84px}
+.adm #fuentes{grid-column:1/-1}
+.admform .fgroup:first-child{border-top:0;padding-top:4px}
+.admform .fgroup{padding:12px 0}
+.admform .fgroup>label small{font-weight:500;color:var(--text-3)}
+.admform .select{width:100%;border-radius:12px}
+.admform .btn{width:100%;margin-top:6px}
+.nuevo-ok p{margin:12px 0}
+.linkbox{display:flex;gap:8px}
+.linkbox .input{font:500 13px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
+.okacts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.okacts .linkbtn{margin-left:auto}
+.listhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+.listhead h2{margin:0}
+.tk{display:flex;gap:16px;justify-content:space-between;align-items:flex-start;padding:16px 0;border-top:1px solid var(--line)}
+.tk:first-child{border-top:0}
+.tk-name{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tk-name b{font:650 17px "Space Grotesk",sans-serif;letter-spacing:-.01em}
+.tk-nota{margin:6px 0 0!important;font-size:13.5px!important}
+.tk-kv{display:flex;flex-wrap:wrap;gap:6px 22px;margin:10px 0 0}
+.tk-kv dt{font-size:11.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.tk-kv dd{margin:2px 0 0;font-size:13.5px}
+.tk-acts{display:flex;flex-direction:column;gap:8px;flex:none;width:170px}
+.tk-acts .select,.tk-acts .btn{width:100%}
+@media (max-width:980px){.adm{grid-template-columns:minmax(0,1fr)}.adm #nuevo{position:static}}
+.adm>.panel{min-width:0}
+.scrollx{overflow-x:auto}
+@media (max-width:640px){.tk{flex-direction:column}.tk-acts{width:100%;flex-direction:row;flex-wrap:wrap}.tk-acts>*{flex:1 1 140px}.linkbox{flex-direction:column}}

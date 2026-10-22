@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#f2f2f2" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#1f1f1f" media="(prefers-color-scheme: dark)">
+<title>Garage · admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<script>try{const t=localStorage.getItem('garage-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="garage.css">
+</head>
+<body>
+<header class="topbar" id="topbar"><div class="topinner">
+ <a class="brand" href="./"><span class="brand-mark">G</span>Garage<small>admin</small></a>
+ <div class="topend"><span class="who hide-m" id="who"></span><a class="btn sm" href="./"><span data-icon="search"></span><span class="lbl">Buscador</span></a><button class="iconbtn" id="theme" aria-label="Cambiar tema"><span data-icon="moon"></span></button></div>
+</div></header>
+
+<section class="gate" id="gate" hidden>
+ <span class="eyebrow"><span class="dot"></span>Administración</span>
+ <h1>Panel de Garage</h1>
+ <p>Entra con tu código de administrador. Si ya entraste en el buscador desde este navegador, se usa el mismo.</p>
+ <form id="gateform"><input class="input" id="gatetoken" autocomplete="off" spellcheck="false" placeholder="Código de acceso" aria-label="Código de acceso"><button class="btn primary" type="submit">Entrar</button></form>
+ <div class="err" id="gateerr" role="alert"></div>
+</section>
+
+<div class="page" id="app" hidden>
+<section class="hero compact">
+ <span class="eyebrow"><span class="dot"></span><span id="eyebrow">Panel de administración</span></span>
+ <h1>Accesos de <em>tus amigos.</em></h1>
+ <p class="lead">Crea un enlace para cada persona, mira quién lo usa y córtalo cuando quieras. El enlace solo se puede ver al crearlo: guárdalo o compártelo en ese momento.</p>
+ <div class="stats" id="stats"></div>
+</section>
+
+<div class="adm">
+ <section class="panel" id="nuevo">
+  <h2>Nuevo acceso</h2>
+  <form id="crear" class="admform">
+   <div class="fgroup"><label for="c-nombre">Nombre</label><input class="input" id="c-nombre" maxlength="60" placeholder="Ej. Marcos" required autocomplete="off"></div>
+   <div class="fgroup"><label for="c-dias">Duración</label>
+    <select class="select" id="c-dias"><option value="30">30 días</option><option value="90">3 meses</option><option value="180">6 meses</option><option value="365" selected>1 año</option><option value="0">Sin caducidad</option></select></div>
+   <div class="fgroup"><label for="c-max">Búsquedas por hora</label>
+    <select class="select" id="c-max"><option value="100">100</option><option value="300" selected>300</option><option value="1000">1.000</option></select></div>
+   <div class="fgroup"><label for="c-nota">Nota <small>(opcional, solo la ves tú)</small></label><input class="input" id="c-nota" maxlength="200" placeholder="Ej. compañero de clase" autocomplete="off"></div>
+   <button class="btn accent" type="submit" id="c-btn"><span data-icon="plus"></span>Crear acceso</button>
+  </form>
+  <div class="nuevo-ok" id="ok" hidden>
+   <span class="badge good">Acceso creado</span>
+   <p>Este es el enlace de <b id="ok-nombre"></b>. <b>Solo se muestra ahora</b>: si lo pierdes, revócalo y crea otro.</p>
+   <div class="linkbox"><input class="input" id="ok-link" readonly aria-label="Enlace de acceso"><button class="btn primary" id="ok-copy" type="button"><span data-icon="copy"></span>Copiar</button></div>
+   <div class="okacts"><button class="btn" id="ok-share" type="button" hidden><span data-icon="share"></span>Compartir</button><a class="btn" id="ok-wa" target="_blank" rel="noopener"><span data-icon="send"></span>WhatsApp</a><button class="linkbtn" id="ok-close" type="button">Hecho</button></div>
+  </div>
+ </section>
+
+ <section class="panel" id="lista">
+  <div class="listhead"><h2>Accesos</h2><div class="seg" id="filtro"><button type="button" data-f="activos" aria-pressed="true">Activos</button><button type="button" data-f="todos" aria-pressed="false">Todos</button></div></div>
+  <div id="tokens"></div>
+ </section>
+
+ <section class="panel" id="fuentes">
+  <h2>Última actualización de anuncios</h2>
+  <div id="pasadas"></div>
+ </section>
+</div>
+<footer class="foot"><span>Garage · panel privado. Las búsquedas por hora protegen la base de datos gratuita.</span><a href="#" id="logout">Salir</a></footer>
+</div>
+<div id="toast" class="toast hidden" role="status"></div>
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

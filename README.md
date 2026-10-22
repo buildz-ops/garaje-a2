@@ -14,6 +14,11 @@ GitHub Actions (cron diario) ──► Supabase (PostgreSQL + funciones) ◄─�
   La web solo puede llamar a `validar`, `opciones` y `buscar`, y todas exigen un token válido (con límite de consultas por hora).
 - **web/**: la página (HTML + JS sin build). `config.js` lleva la URL y la clave *pública* de Supabase.
 
+## Panel de administración
+
+`/admin.html` (o el botón «Admin» del buscador) permite crear, renovar, limitar y revocar accesos sin tocar SQL.
+Solo entra un token con `admin = true` (ver `supabase/admin.sql`). Al crear un acceso, el enlace se muestra una sola vez.
+
 ## Tokens (desde el SQL Editor de Supabase)
 
 ```sql

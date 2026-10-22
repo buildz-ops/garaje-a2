@@ -249,6 +249,7 @@ async function start() {
     OPC = await rpc('opciones', {}) || {};
     $('gate').hidden = true; $('app').hidden = false; $('topnav').hidden = false;
     $('who').textContent = v && v.nombre ? 'Hola, ' + v.nombre : '';
+    $('adminlink').hidden = !(v && v.admin);
     const act = OPC.actualizado ? new Date(OPC.actualizado) : null;
     $('eyebrow').textContent = act ? `Actualizado el ${act.toLocaleDateString('es-ES', {day: 'numeric', month: 'long'})} a las ${act.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}` : 'Sin datos todavía';
     const F = OPC.fuentes || {};
