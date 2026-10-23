@@ -179,7 +179,8 @@ begin
   if f ? 'vendedor' then w := w || ' and a.vendedor = $1->>''vendedor'''; end if;
   if f->>'fin' = 'con' then w := w || ' and a.financiacion'; elsif f->>'fin' = 'sin' then w := w || ' and not a.financiacion'; end if;
   if (f->>'envio')::boolean then w := w || ' and a.envio'; end if;
-  if f ? 'fuente' then w := w || ' and a.fuente = $1->>''fuente'''; end if;
+  -- con una web elegida se ven todos sus anuncios, también los que se muestran agrupados bajo otra web
+  if f ? 'fuente' then w := replace(w, 'a.activo and a.principal', 'a.activo') || ' and a.fuente = $1->>''fuente'''; end if;
   if lat is not null and lon is not null then
     dist := '(2 * 6371 * asin(sqrt(power(sin(radians(a.lat - $2) / 2), 2) + cos(radians($2)) * cos(radians(a.lat)) * power(sin(radians(a.lon - $3) / 2), 2))))';
     if f ? 'radio' then w := w || ' and a.lat is not null and ' || dist || ' <= ($1->>''radio'')::numeric'; end if;
