@@ -103,7 +103,7 @@ function pintarTokens() {
 }
 
 function pintarPasadas() {
-  const N = {wallapop: 'Wallapop', milanuncios: 'Milanuncios', motosnet: 'motos.net'};
+  const N = {wallapop: 'Wallapop', milanuncios: 'Milanuncios', motosnet: 'motos.net', mundimoto: 'Mundimoto', autoscout24: 'AutoScout24', cuimo: 'Cüimo', flexibike: 'Flexibike', motores: 'motor.es'};
   const F = (D.datos && D.datos.fuentes) || {};
   if (!D.pasadas.length) {$('pasadas').innerHTML = '<p>Todavía no hay ninguna actualización registrada.</p>'; return}
   $('pasadas').innerHTML = `<div class="scrollx"><table class="tbl"><thead><tr><th>Web</th><th>Estado</th><th>Cuándo</th><th>Leídos</th><th>Retirados</th><th>Activos</th></tr></thead><tbody>${

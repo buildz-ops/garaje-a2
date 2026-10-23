@@ -54,7 +54,7 @@ const saveFavs = () => {store.set('garage-favs', JSON.stringify(favs)); $('savec
 
 const TIPOS = {naked: 'Naked', deportiva: 'Deportiva', trail: 'Trail', scooter: 'Scooter', custom: 'Custom', touring: 'Touring', campo: 'Campo / cross', clasica: 'Clásica', ciclomotor: 'Ciclomotor', electrica: 'Eléctrica', quad: 'Quad', otra: 'Otra'};
 const A2 = {apta: ['Apta A2', 'good'], limitable: ['Limitable A2', 'info'], no: ['No apta A2', 'bad'], desconocido: ['A2 sin datos', '']};
-const FUENTES = {wallapop: 'Wallapop', milanuncios: 'Milanuncios', motosnet: 'motos.net'};
+const FUENTES = {wallapop: 'Wallapop', milanuncios: 'Milanuncios', motosnet: 'motos.net', mundimoto: 'Mundimoto', autoscout24: 'AutoScout24', cuimo: 'Cüimo', flexibike: 'Flexibike', motores: 'motor.es'};
 
 function seg(id, opts, key, single) {
   const el = $(id);
@@ -253,7 +253,7 @@ async function start() {
     const act = OPC.actualizado ? new Date(OPC.actualizado) : null;
     $('eyebrow').textContent = act ? `Actualizado el ${act.toLocaleDateString('es-ES', {day: 'numeric', month: 'long'})} a las ${act.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}` : 'Sin datos todavía';
     const F = OPC.fuentes || {};
-    $('stats').innerHTML = [['Anuncios', num(OPC.total || 0), 'activos ahora'], ['Wallapop', num(F.wallapop || 0), 'anuncios'], ['Milanuncios', num(F.milanuncios || 0), 'anuncios'], ['motos.net', num(F.motosnet || 0), 'anuncios']]
+    $('stats').innerHTML = [['Anuncios', num(OPC.total || 0), 'activos ahora'], ['Wallapop', num(F.wallapop || 0), 'anuncios'], ['Milanuncios', num(F.milanuncios || 0), 'anuncios'], ['motos.net y otras', num(Object.entries(F).filter(([k]) => k !== 'wallapop' && k !== 'milanuncios').reduce((t, [, n]) => t + n, 0)), `${Object.keys(F).length - 2} webs más`]]
       .map(([a, b, c]) => `<div class="stat"><small>${a}</small><strong class="num">${b}</strong><span>${c}</span></div>`).join('');
     fillFilters();
     if (!bound) {bindInputs(); bound = true}

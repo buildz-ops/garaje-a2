@@ -1,9 +1,9 @@
 """Pasada diaria del buscador: lee cada fuente, guarda en Supabase, desactiva lo que ya no está publicado y recalcula filtros.
-Uso: python3 main.py [--solo motosnet,wallapop,milanuncios] [--max-fichas N]
+Uso: python3 main.py [--solo motosnet,wallapop,milanuncios,mundimoto,cuimo,autoscout24,flexibike] [--max-fichas N]
 Variables: SUPABASE_KEY (service_role) o INGEST_KEY."""
 import argparse, datetime, sys, threading, traceback
 from red import log
-import db, motosnet, wallapop, milanuncios
+import db, motosnet, wallapop, milanuncios, tiendas
 
 
 def ahora():
@@ -34,7 +34,7 @@ def pasada(nombre, fn):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--solo', default='motosnet,wallapop,milanuncios')
+    ap.add_argument('--solo', default=','.join(['motosnet', 'wallapop', 'milanuncios', *tiendas.LECTORES]))
     ap.add_argument('--max-fichas', type=int, default=None, help='límite de fichas nuevas de Wallapop (para pruebas)')
     ap.add_argument('--minutos', type=int, default=240, help='tiempo máximo abriendo fichas de Wallapop (el resto, mañana)')
     a = ap.parse_args()
@@ -50,6 +50,9 @@ def main():
         res['motosnet'] = pasada('motosnet', motosnet.leer)
     if 'milanuncios' in solo:   # después de motos.net: usa sus modelos para reconocerlos en títulos libres
         res['milanuncios'] = pasada('milanuncios', milanuncios.leer)
+    for nombre, fn in tiendas.LECTORES.items():
+        if nombre in solo:
+            res[nombre] = pasada(nombre, fn)
     for t in hilos:
         t.join()
     try:
