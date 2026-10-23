@@ -54,7 +54,7 @@ const saveFavs = () => {store.set('garage-favs', JSON.stringify(favs)); $('savec
 
 const TIPOS = {naked: 'Naked', deportiva: 'Deportiva', trail: 'Trail', scooter: 'Scooter', custom: 'Custom', touring: 'Touring', campo: 'Campo / cross', clasica: 'Clásica', ciclomotor: 'Ciclomotor', electrica: 'Eléctrica', quad: 'Quad', otra: 'Otra'};
 const A2 = {apta: ['Apta A2', 'good'], limitable: ['Limitable A2', 'info'], no: ['No apta A2', 'bad'], desconocido: ['A2 sin datos', '']};
-const FUENTES = {wallapop: 'Wallapop', milanuncios: 'Milanuncios', motosnet: 'motos.net', mundimoto: 'Mundimoto', autoscout24: 'AutoScout24', cuimo: 'Cüimo', flexibike: 'Flexibike', motores: 'motor.es'};
+const FUENTES = {wallapop: 'Wallapop', milanuncios: 'Milanuncios', motosnet: 'motos.net', mundimoto: 'Mundimoto', autoscout24: 'AutoScout24', cuimo: 'Cüimo', flexibike: 'Flexibike', motores: 'motor.es', mundimotoparticulares: 'Mundimoto Particulares', motick: 'Motick'};
 
 function seg(id, opts, key, single) {
   const el = $(id);

@@ -1,4 +1,4 @@
-"""Webs más pequeñas que los tres portales grandes: Mundimoto, Cüimo, AutoScout24, Flexibike y motor.es.
+"""Webs más pequeñas que los tres portales grandes: Mundimoto (y sus particulares), Cüimo, AutoScout24, Flexibike, motor.es y Motick.
 Todas dan el listado completo por API o JSON incrustado, así que no se abren fichas.
 Cada lector devuelve (filas, completo), igual que motosnet.leer()."""
 import json, re, datetime
@@ -242,4 +242,104 @@ def motores():
     return list(filas.values()), fallos <= 3 and len(filas) > 0
 
 
-LECTORES = {'mundimoto': mundimoto, 'cuimo': cuimo, 'autoscout24': autoscout24, 'flexibike': flexibike, 'motores': motores}
+# ── Mundimoto Particulares: web aparte de particulares, JSON incrustado en el catálogo (12 por página) ──
+MMP_TIPOS = {'naked': 'naked', 'deportiva': 'deportiva', 'trail': 'trail', 'scooter': 'scooter', 'maxi-scooter': 'scooter', 'custom': 'custom',
+             'touring': 'touring', 'off-road': 'campo', 'supermotard': 'campo', 'clasica': 'clasica', 'tres-ruedas': 'scooter'}
+MMP_ITEM = re.compile(r'\{"id":"[0-9a-f-]{36}","brand"')
+
+
+def mmp_pagina(pg):
+    h = get(f'https://www.mundimotoparticulares.com/catalogo-motos-baratas-usadas?page={pg}', ok=lambda h: '__next_f' in h)
+    if h is None:
+        return None
+    s = ''.join(json.loads('"' + c + '"') for c in ME_RX.findall(h))
+    enlaces = {u.rsplit('-', 1)[-1]: u for u in re.findall(r'href="(/motos/[^"]+)"', h)}
+    return [(x, enlaces.get(x['id'][:8])) for x in objetos(s, MMP_ITEM)]
+
+
+def mundimoto_particulares():
+    filas, fallos, pg = {}, 0, 1
+    while pg <= 60:
+        lote = pmap(mmp_pagina, range(pg, pg + 6), 3)
+        fallos += sum(1 for its in lote if its is None)
+        nuevos = 0
+        for its in lote:
+            for x, ruta in its or []:
+                precio = entero(x.get('offer_price') or x.get('price'))
+                if x.get('status') not in (None, 'PUBLISHED') or not precio or precio < 300 or 'mmp-' + x['id'] in filas:
+                    continue
+                lic = x.get('license') or ''
+                marca = N.marca_canon(x.get('brand'))
+                modelo = ' '.join(v for v in (x.get('model'), x.get('version')) if v).strip() or None
+                slug = re.sub(r'[^a-z0-9]+', '-', f'{x.get("brand") or ""} {x.get("model") or ""}'.lower()).strip('-')
+                f = base(id='mmp-' + x['id'], fuente='mundimotoparticulares',
+                         url='https://www.mundimotoparticulares.com' + (ruta or f'/motos/{slug}-{x["id"][:8]}'),
+                         marca=marca, modelo=modelo, anio=x.get('year'), km=x.get('kilometers'), cc=x.get('cubic_capacity'),
+                         cv=round(x['kw'] * 1.36) if x.get('kw') else None, precio=precio, vendedor='particular',
+                         a2='apta' if lic == 'a2' else ('limitable' if 'limitable' in lic else None),
+                         tipo=MMP_TIPOS.get(x.get('model_type') or ''), provincia=x.get('province'), imagen=x.get('url_image'),
+                         publicado=x.get('created_at'))
+                filas[f['id']] = f; nuevos += 1
+        if not nuevos:
+            break
+        pg += 6
+    log('mundimotoparticulares', 'leídos', len(filas), 'páginas', pg - 1, 'fallidas', fallos)
+    return list(filas.values()), fallos == 0 and len(filas) > 0
+
+
+# ── Motick: listado AJAX de su web (9 por petición); la tarjeta ya trae permiso, tipo, año, km, cc, precio y cuota ──
+MK_UA = 'Mozilla/5.0 Chrome/130'
+MK_TIPOS = {'NAKED': 'naked', 'DEPORTIVA': 'deportiva', 'TRAIL': 'trail', 'SCOOTER': 'scooter', 'MAXI SCOOTER': 'scooter', 'CUSTOM': 'custom',
+            'TOURING': 'touring', 'ENDURO': 'campo', 'CROSS': 'campo', 'SUPERMOTARD': 'campo', 'CLASICA': 'clasica', 'CICLOMOTOR': 'ciclomotor'}
+
+
+def mk_pagina(start):
+    return getjson('https://www.motick.com/ajax-lista.php', ua=MK_UA, timeout=40,
+                   headers={'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded', 'Referer': 'https://www.motick.com/motos-ocasion'},
+                   data=f'start={start}&tags=%7B%7D&orden=A&donde=V&viene=V&vista=G&isMobile=N&ajax=S')
+
+
+def mk_num(s):
+    return entero((s or '').replace('.', '')) if s else None
+
+
+def motick():
+    filas, fallos, start, fin = {}, 0, 0, False
+    while start < 6000 and not fin:
+        nuevos = 0
+        for d in pmap(mk_pagina, range(start, start + 72, 9), 4):
+            if not d:
+                fallos += 1; continue
+            fin = fin or d.get('hayRegs') != 'S'
+            for c in d.get('res', '').split('car-card showHover')[1:]:
+                m = re.search(r'href="\.?/?(motos-ocasion/[^"]+_(\d+))"\s+title="([^"]+)"', c)
+                if not m or 'mk-' + m.group(2) in filas:
+                    continue
+                t = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', re.sub(r'<script.*?</script>', '', c, flags=re.S))).replace('&euro;', '€')
+                if re.search(r'>\s*(?:Reservada|Vendida|RESERVADA|VENDIDA)\s*<', c):
+                    continue
+                titulo = re.sub(r'\s+(?:19|20)\d{2}$', '', m.group(3).replace(' de ocasión', '')).strip()
+                g = lambda rx: (re.search(rx, t) or [None, None])[1]
+                partes = re.search(r'\| ([A-ZÁÉÍÓÚ ]+) \| ((?:19|20)\d{2}) \|', t)
+                precio = mk_num(g(r'cc ([\d.]+) €')) or mk_num(g(r'km ([\d.]+) €'))
+                if not precio or precio < 300:
+                    continue
+                cuota = mk_num(g(r'([\d.]+) € / mes'))
+                lic = g(r'\) ?(A2|A1|AM|A|B) \|') or g(r' (A2|A1|AM|A|B) \| [A-ZÁÉÍÓÚ ]+ \| (?:19|20)\d{2}')
+                img = (re.search(r'<img[^>]+src="(https[^"]+)"', c) or [None, None])[1]
+                marca = N.marca_de(titulo)
+                f = base(id='mk-' + m.group(2), fuente='motick', url='https://www.motick.com/' + m.group(1), titulo=titulo,
+                         marca=marca, modelo=titulo.split(' ', 1)[1] if marca and ' ' in titulo else None,
+                         anio=partes.group(2) if partes else None, km=mk_num(g(r'\| ([\d.]+) km')), cc=mk_num(g(r'\| ([\d.]+) cc')),
+                         precio=precio, a2='apta' if lic == 'A2' else None, nombre_vendedor='Motick', financiacion=bool(cuota), cuota=cuota,
+                         garantia=True, tipo=MK_TIPOS.get(partes.group(1).strip()) if partes else None, imagen=img)
+                filas[f['id']] = f; nuevos += 1
+        if not nuevos:
+            break
+        start += 72
+    log('motick', 'leídos', len(filas), 'peticiones hasta', start, 'fallidas', fallos)
+    return list(filas.values()), fallos <= 2 and len(filas) > 0
+
+
+LECTORES = {'mundimoto': mundimoto, 'cuimo': cuimo, 'autoscout24': autoscout24, 'flexibike': flexibike, 'motores': motores,
+            'mundimotoparticulares': mundimoto_particulares, 'motick': motick}
